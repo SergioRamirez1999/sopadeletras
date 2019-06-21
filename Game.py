@@ -18,32 +18,41 @@ properties._load_properties()
 WINDOW_WIDTH = 760
 WINDOW_HEIGHT = 820
 WINDOW_TITLE = 'Sopa De Letras'
+HELP_FONT_SIZE = 23
 ### Parametros adicionales ###
 GAME_WORDS = properties.words
 
 
+pygame.font.init()
+win = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+pygame.display.set_caption(WINDOW_TITLE)
+GAME_BOARD = create_board(GAME_WORDS, properties.orientation)
+grid = Grid(GAME_BOARD, WINDOW_WIDTH, WINDOW_HEIGHT-60)
+start = time.time()
+correct_words = []
+
 def redraw_window(win, grid, time, correct_words):
     win.fill(properties.backgroundColor)
-    fnt = pygame.font.SysFont(properties.fontFamily, 40)
-    text_time = fnt.render("Tiempo: " + format_time(time), True, (255,0,0))
-    win.blit(text_time, (WINDOW_WIDTH - 170, WINDOW_HEIGHT-40))
+    if(properties.help):
+        margin = 15
+        gap = 10
+        fnt = pygame.font.SysFont(properties.fontFamily, HELP_FONT_SIZE)
+        for w in GAME_WORDS:
+            word = w[0]
+            text_time = fnt.render(word, True, (255,0,0))
+            win.blit(text_time, (gap, WINDOW_HEIGHT-40))
+            text_width, text_height = fnt.size(w[0])
+            gap += text_width + margin
     grid.draw(win)
 
 
-def format_time(secs):
-    sec = secs%60
-    minute = secs//60
-    hour = minute//60
-    mat = '{}:{}'.format(str(minute), str(sec))
-    return mat
-
-
-def is_valid_word(grid):
+def word_validator(grid):
     b_coord = set(grid.board_coord)
     w_coord = get_words_coords()
     #Buscar una forma de retornar la primera ocurrencia / True
     tuple = [(k,v) for k,v in w_coord.items() if set(v)==b_coord]
     if(len(tuple)):
+        correct_words.append(tuple[0][0])
         for t in tuple[0][1]:
             grid.cubes[t[0]][t[1]].found = True
     return len(tuple)
@@ -58,22 +67,12 @@ def game_over(win):
     pygame.display.update()
 
 
-pygame.font.init()
-win = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-pygame.display.set_caption(WINDOW_TITLE)
-GAME_BOARD = create_board(GAME_WORDS, properties.orientation)
-grid = Grid(GAME_BOARD, WINDOW_WIDTH, WINDOW_HEIGHT-60)
-start = time.time()
-correct_words = 0
-
-
 def play_again():
     global GAME_BOARD, grid, start, correct_words
     GAME_BOARD = create_board(GAME_WORDS, properties.orientation)
     grid = Grid(GAME_BOARD, WINDOW_WIDTH, WINDOW_HEIGHT-60)
     start = time.time()
-    correct_words = 0
-
+    correct_words = []
 
 def main_loop():
     global GAME_BOARD, grid, start, correct_words
@@ -88,10 +87,8 @@ def main_loop():
                 run = False
             if(event.type == pygame.KEYDOWN):
                 if(event.key == pygame.K_RETURN):
-                    if(is_valid_word(grid)):
-                        #Mostrar alguito
-                        correct_words += 1
-                    if(correct_words == len(GAME_WORDS)):
+                    word_validator(grid)
+                    if(len(correct_words) == len(GAME_WORDS)):
                         #TODAS LAS PALABRAS ENCONTRADAS
                         game_over(win)
                         waiting = True

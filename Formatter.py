@@ -1,5 +1,5 @@
 from pattern.web import Wiktionary
-from pattern.es import lexicon
+from pattern.es import lexicon, parse
 import json
 
 def search_wiktionary(word):
@@ -8,6 +8,9 @@ def search_wiktionary(word):
     return data
 
 def search_pattern(word):
+    return parse(word)
+
+def exist_lexicon(word):
     if (not(word.lower() in lexicon) and not(word.upper() in lexicon) and not(word.capitalize() in lexicon)):
         return False
     return True
@@ -60,9 +63,9 @@ def words_formatter(words):
             if(not search_pattern(words[i])):
                 unknown_words_pattern.append(words[i])
         else:
-            data = search_pattern(words[i])
-            if(data):
-                type = get_type_pattern(data)
+            exist = exist_lexicon(words[i])
+            if(exist):
+                type = get_type_pattern(words[i])
                 definition = 'undefined'
                 formated_words.append((words[i], type, definition))
             else:
