@@ -11,4 +11,4 @@ existen incompatibilidades con pattern.es. Solo fue testeado en Ubuntu.
 Hasta el momento no llegue a mostrar ayuda por definicion de palaras ya que no provee informacion
 de utilidad. Sin embargo, la informacion esta cargada en las estructuras.
 El juego esta hecho con pygames. La ventana de configuraciones esta creada con PySimpleGUI.
-Use pygames porque pienso usarlo en un futuro proximo. No sabia que no estaba permitido.
+Use pygames porque pienso usarlo en un futuro proximo.
